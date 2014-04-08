@@ -117,44 +117,31 @@ public class Main {
     
     // Attempt to open file
     File inputFile = new File(source);
-    FileInputStream inputStream;
-    try {
-      inputStream = new FileInputStream(inputFile);
+    try (FileInputStream inputStream = new FileInputStream(inputFile);){
+      DbxEntry.File uploadedFile = null;
+      // Attempt to upload file
+      uploadedFile = client.uploadFile(
+          dest,
+          DbxWriteMode.add(), //                          <-- Renames the file to (1) if it exists...
+          //DbxWriteMode.force()                          <-- Blasts the file and starts again...
+          //DbxWriteMode.update(String revisionToReplace) <-- Updates the file, produces conflicted copy if changed since last pull...
+          inputFile.length(),
+          inputStream
+      );
+      System.out.println("Upload Successful");
+      return uploadedFile;
+    
     } catch (FileNotFoundException e) {
       System.err.println("File not found: " + source);
-      return null;
     } catch (SecurityException e) {
       System.err.println("Permission denied: " + source);
-      return null;
-    }
-    
-    // Attempt to upload file
-    DbxEntry.File uploadedFile = null;
-    try {
-      uploadedFile = client.uploadFile(
-            dest,
-            DbxWriteMode.add(), //                          <-- Renames the file to (1) if it exists...
-            //DbxWriteMode.force()                          <-- Blasts the file and starts again...
-            //DbxWriteMode.update(String revisionToReplace) <-- Updates the file, produces conflicted copy if changed since last pull...
-            inputFile.length(),
-            inputStream
-         );
-        System.out.println("Upload Successful");
     } catch (DbxException e) {
       System.err.println("Upload Error: Dropbox returned an error.");
-      return null;
     } catch (IOException e) {
       System.err.println("Upload Error: Could not read file.");
-    } finally {
-        // Close the input stream.
-        try {
-          inputStream.close();
-        } catch (IOException e) {
-          System.err.println("Warning: Could not close input stream for " + source);
-        }
     }
     
-    return uploadedFile;
+    return null;
   }
 
   /**
