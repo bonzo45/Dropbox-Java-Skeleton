@@ -10,6 +10,7 @@ public class Main {
   private static final String APP_KEY = "YOUR_KEY_HERE";
   private static final String APP_SECRET = "YOUR_SECRET_HERE";
   private static final String APP_NAME = "YOUR_APPLICATION_NAME_HERE";
+  private static final String ACCESS_TOKEN = "YOUR PERSISTENT ACCESS TOKEN HERE";
 
   public static void main(String[] args) throws IOException, DbxException {
     // Initialise
@@ -163,7 +164,7 @@ public class Main {
       accessToken = authorise(appInfo, config);
     }
     else {
-      accessToken = "BODGE_REMEMBER_HERE";
+      accessToken = ACCESS_TOKEN;
    }
     
     // If valid then create the client
